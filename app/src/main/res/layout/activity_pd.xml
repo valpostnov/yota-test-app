@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/margin_medium">
@@ -12,33 +11,32 @@
         android:hint="@string/txt_url"
         android:singleLine="true"
         android:id="@+id/editTextAddress"
-        android:layout_toLeftOf="@+id/btnGo"
         android:layout_toStartOf="@+id/btnGo"
-        android:text="http://"
-        android:inputType="textWebEditText"
-        android:imeOptions="actionGo" />
+        android:inputType="textUri"
+        android:imeOptions="actionGo|flagNoExtractUi" />
     <Button
+        android:id="@+id/btnGo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btn_go"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/btnGo"
-        android:onClick="onGoClick"/>
+        android:onClick="onGoClick"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_alignBaseline="@+id/editTextAddress"
+        />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".pagedownloader.PDActivity"
         android:layout_below="@+id/editTextAddress"
         android:layout_marginTop="@dimen/margin_medium">
 
         <TextView
+            android:id="@+id/txtSource"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/txt_code_stub"
-            android:id="@+id/txtSource"/>
+            />
 
     </ScrollView>
 

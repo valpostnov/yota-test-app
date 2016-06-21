@@ -3,12 +3,15 @@ package com.postnov.android.yotatestapp.pagedownloader;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.postnov.android.yotatestapp.R;
+import com.postnov.android.yotatestapp.Utils;
 import com.postnov.android.yotatestapp.pagedownloader.interfaces.PDPresenter;
 import com.postnov.android.yotatestapp.pagedownloader.interfaces.PDView;
 
@@ -16,8 +19,8 @@ public class PDActivity extends AppCompatActivity implements PDView
 {
     public static final String STATE = "com.postnov.android.STATE";
 
-    private EditText mAddressFiled;
-    private TextView mSourceField;
+    private EditText mAddressView;
+    private TextView mSourceView;
     private ProgressDialog mProgressDialog;
     private PDPresenter mPresenter;
 
@@ -31,14 +34,14 @@ public class PDActivity extends AppCompatActivity implements PDView
 
         if (savedInstanceState != null)
         {
-            mSourceField.setText(savedInstanceState.getString(STATE));
+            mSourceView.setText(savedInstanceState.getString(STATE));
         }
     }
 
     @Override
     public void showSource(String s)
     {
-        mSourceField.setText(s);
+        mSourceView.setText(s);
     }
 
     @Override
@@ -56,7 +59,7 @@ public class PDActivity extends AppCompatActivity implements PDView
     @Override
     public void showError(Throwable t)
     {
-        mSourceField.setText(t.getMessage());
+        mSourceView.setText(t.getMessage());
     }
 
     @Override
@@ -68,7 +71,7 @@ public class PDActivity extends AppCompatActivity implements PDView
 
     public void onGoClick(View view)
     {
-        mPresenter.getPage(String.valueOf(mAddressFiled.getText()));
+        go();
         hideKeyboard();
     }
 
@@ -83,17 +86,38 @@ public class PDActivity extends AppCompatActivity implements PDView
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE, String.valueOf(mSourceField.getText()));
+        outState.putString(STATE, String.valueOf(mSourceView.getText()));
     }
 
     private void initViews()
     {
-        mAddressFiled = (EditText) findViewById(R.id.editTextAddress);
-        mSourceField = (TextView) findViewById(R.id.txtSource);
+        mSourceView = (TextView) findViewById(R.id.txtSource);
+        mAddressView = (EditText) findViewById(R.id.editTextAddress);
+        mAddressView.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        {
+            @Override
+            public boolean onEditorAction(TextView tv, int actionId, KeyEvent event)
+            {
+                switch (actionId)
+                {
+                    case EditorInfo.IME_ACTION_GO:
+                        go();
+                        hideKeyboard();
+                        return true;
+                }
+                return false;
+            }
+        });
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage(getString(R.string.downloading));
+    }
+
+    private void go()
+    {
+        String address = Utils.formatUrl(String.valueOf(mAddressView.getText()));
+        mPresenter.getPage(address);
     }
 
     private void hideKeyboard()

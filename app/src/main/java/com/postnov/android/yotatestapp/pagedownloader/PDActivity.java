@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -59,15 +60,16 @@ public class PDActivity extends AppCompatActivity implements PDView
     }
 
     @Override
-    protected void onResume()
+    protected void onStart()
     {
-        super.onResume();
+        super.onStart();
         mPresenter.bind(this);
     }
 
     public void onGoClick(View view)
     {
         mPresenter.getPage(String.valueOf(mAddressFiled.getText()));
+        hideKeyboard();
     }
 
     @Override
@@ -92,5 +94,20 @@ public class PDActivity extends AppCompatActivity implements PDView
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage(getString(R.string.downloading));
+    }
+
+    private void hideKeyboard()
+    {
+        View view = getCurrentFocus();
+        if (view != null)
+        {
+            view.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+            if (imm != null)
+            {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ import rx.subjects.Subject;
 public class RxBus
 {
     private String TAG = "RxBus";
-    private Subject<Object, Object> mBus;
+    private final Subject<Object, Object> mBus;
 
     public RxBus()
     {

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">YotaTestApp</string>
+    <string name="txt_code_stub">Web page source code</string>
+    <string name="btn_go">Go!</string>
+    <string name="txt_url">Enter address</string>
+    <string name="downloading">Загрузка</string>
+</resources>

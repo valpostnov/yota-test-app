@@ -12,7 +12,6 @@ import com.postnov.android.yotatestapp.pagedownloader.interfaces.PDView;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by platon on 21.06.2016.
@@ -21,7 +20,7 @@ public class PDPresenterImpl implements PDPresenter
 {
     private PDView mView;
     private RxBus mEventBus;
-    private Subscription mRxSubscription;
+    private Subscription mRxBusSubscription;
     private Context mContext;
 
     public PDPresenterImpl(Context context)
@@ -36,7 +35,7 @@ public class PDPresenterImpl implements PDPresenter
         mView.showProgressDialog();
         PDService.startService(mContext, url);
         unsubscribe();
-        mRxSubscription = mEventBus
+        mRxBusSubscription = mEventBus
                 .toObservable()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(new Action1<Object>()
@@ -74,9 +73,9 @@ public class PDPresenterImpl implements PDPresenter
 
     private void unsubscribe()
     {
-        if (mRxSubscription != null && !mRxSubscription.isUnsubscribed())
+        if (mRxBusSubscription != null && !mRxBusSubscription.isUnsubscribed())
         {
-            mRxSubscription.unsubscribe();
+            mRxBusSubscription.unsubscribe();
         }
     }
 }

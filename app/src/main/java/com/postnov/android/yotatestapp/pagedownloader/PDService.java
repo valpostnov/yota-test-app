@@ -11,6 +11,7 @@ import com.postnov.android.yotatestapp.bus.RxBus;
 import com.postnov.android.yotatestapp.bus.events.SuccessEvent;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +26,10 @@ public class PDService extends IntentService
 {
     public static final String TAG = "PDService";
     public static final String EXTRA_URL = "com.postnov.android.URL";
+
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECTION_TIMEOUT = 15000;
+    private static final String REQUEST_METHOD = "GET";
 
     private RxBus mEventBus;
 
@@ -68,29 +73,27 @@ public class PDService extends IntentService
     private InputStream getIS(String urlString) throws IOException
     {
         URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(15000);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setReadTimeout(READ_TIMEOUT);
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        connection.setRequestMethod(REQUEST_METHOD);
+        connection.setDoInput(true);
 
-        conn.connect();
-        return conn.getInputStream();
+        connection.connect();
+        return connection.getInputStream();
     }
 
     private String getStringFromIS(InputStream stream) throws IOException
     {
-        Reader reader = new InputStreamReader(stream, "UTF-8");
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(reader);
-        String read;
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
 
-        while ((read = br.readLine()) != null)
+        while ((length = stream.read(buffer)) != -1)
         {
-            sb.append(read);
+            result.write(buffer, 0, length);
         }
 
-        br.close();
-        return sb.toString();
+        return result.toString("UTF-8");
     }
 }

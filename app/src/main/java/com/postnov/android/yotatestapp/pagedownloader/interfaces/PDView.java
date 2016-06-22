@@ -8,5 +8,5 @@ public interface PDView
     void showSource(String s);
     void showProgressDialog();
     void hideProgressDialog();
-    void showError(Throwable t);
+    void showError(String errorMessage);
 }

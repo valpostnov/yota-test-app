@@ -5,15 +5,15 @@ package com.postnov.android.yotatestapp.bus.events;
  */
 public class ErrorEvent
 {
-    private Throwable mError;
+    private String mErrorMessage;
 
-    public ErrorEvent(Throwable error)
+    public ErrorEvent(String errorMsg)
     {
-        mError = error;
+        mErrorMessage = errorMsg;
     }
 
-    public Throwable getError()
+    public String getErrorMessage()
     {
-        return mError;
+        return mErrorMessage;
     }
 }

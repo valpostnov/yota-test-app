@@ -17,31 +17,33 @@ import com.postnov.android.yotatestapp.pagedownloader.interfaces.PDView;
 
 public class PDActivity extends AppCompatActivity implements PDView
 {
-    public static final String STATE = "com.postnov.android.STATE";
+    public static final String RESULT_STATE = "com.postnov.android.RESULT_STATE";
+    private static final String PD_STATE = "com.postnov.android.PD_STATE";
 
     private EditText mAddressView;
-    private TextView mSourceView;
+    private TextView mResultView;
     private ProgressDialog mProgressDialog;
     private PDPresenter mPresenter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    protected void onCreate(Bundle bundle)
     {
-        super.onCreate(savedInstanceState);
+        super.onCreate(bundle);
         setContentView(R.layout.activity_pd);
         mPresenter = new PDPresenterImpl(this);
         initViews();
 
-        if (savedInstanceState != null)
+        if (bundle != null)
         {
-            mSourceView.setText(savedInstanceState.getString(STATE));
+            mResultView.setText(bundle.getString(RESULT_STATE));
+            if (bundle.getBoolean(PD_STATE)) mProgressDialog.show();
         }
     }
 
     @Override
     public void showSource(String s)
     {
-        mSourceView.setText(s);
+        mResultView.setText(s);
     }
 
     @Override
@@ -57,9 +59,9 @@ public class PDActivity extends AppCompatActivity implements PDView
     }
 
     @Override
-    public void showError(Throwable t)
+    public void showError(String errorMessage)
     {
-        mSourceView.setText(t.getMessage());
+        mResultView.setText(errorMessage);
     }
 
     @Override
@@ -86,12 +88,13 @@ public class PDActivity extends AppCompatActivity implements PDView
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE, String.valueOf(mSourceView.getText()));
+        outState.putString(RESULT_STATE, String.valueOf(mResultView.getText()));
+        outState.putBoolean(PD_STATE, mProgressDialog.isShowing());
     }
 
     private void initViews()
     {
-        mSourceView = (TextView) findViewById(R.id.txtSource);
+        mResultView = (TextView) findViewById(R.id.txtSource);
         mAddressView = (EditText) findViewById(R.id.editTextAddress);
         mAddressView.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
@@ -112,6 +115,7 @@ public class PDActivity extends AppCompatActivity implements PDView
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setMessage(getString(R.string.downloading));
+        mProgressDialog.setCancelable(false);
     }
 
     private void go()

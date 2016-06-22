@@ -5,23 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.postnov.android.yotatestapp.Utils;
 import com.postnov.android.yotatestapp.YotaTestApp;
 import com.postnov.android.yotatestapp.bus.events.ErrorEvent;
 import com.postnov.android.yotatestapp.bus.RxBus;
 import com.postnov.android.yotatestapp.bus.events.SuccessEvent;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by postnov on 23.02.2016.
- */
+import static java.net.HttpURLConnection.HTTP_OK;
+
 public class PDService extends IntentService
 {
     public static final String TAG = "PDService";
@@ -57,20 +54,37 @@ public class PDService extends IntentService
     protected void onHandleIntent(Intent intent)
     {
         String url = intent.getStringExtra(EXTRA_URL);
+        HttpURLConnection conn = null;
 
-        try (InputStream stream = getIS(url))
+        try
         {
-            String result = getStringFromIS(stream);
-            mEventBus.post(new SuccessEvent(result));
+            conn = getConnection(url);
+            switch (conn.getResponseCode())
+            {
+                case HTTP_OK:
+                    String result = getStringFromIS(conn.getInputStream());
+                    mEventBus.post(new SuccessEvent(result));
+                    break;
+
+                default:
+                    String error = Utils.formatResponse(conn.getResponseMessage(), conn.getResponseCode());
+                    mEventBus.post(new ErrorEvent(error));
+            }
         }
         catch (IOException e)
         {
-            Log.e(TAG, e.getMessage());
-            mEventBus.post(new ErrorEvent(e));
+            mEventBus.post(new ErrorEvent(e.getMessage()));
+        }
+        finally
+        {
+            if (conn != null)
+            {
+                conn.disconnect();
+            }
         }
     }
 
-    private InputStream getIS(String urlString) throws IOException
+    private HttpURLConnection getConnection(String urlString) throws IOException
     {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -80,7 +94,7 @@ public class PDService extends IntentService
         connection.setDoInput(true);
 
         connection.connect();
-        return connection.getInputStream();
+        return connection;
     }
 
     private String getStringFromIS(InputStream stream) throws IOException

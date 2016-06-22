@@ -30,4 +30,9 @@ public class RxBus
     {
         return mBus;
     }
+
+    public boolean hasObservers()
+    {
+        return mBus.hasObservers();
+    }
 }

@@ -34,7 +34,33 @@ public class PDPresenterImpl implements PDPresenter
     {
         mView.showProgressDialog();
         PDService.startService(mContext, url);
-        unsubscribe();
+    }
+
+    @Override
+    public void bind(PDView view)
+    {
+        mView = view;
+        startEventBus();
+    }
+
+    @Override
+    public void unbind()
+    {
+        stopEventBus();
+        mView.hideProgressDialog();
+        mView = null;
+    }
+
+    private void stopEventBus()
+    {
+        if (mRxBusSubscription != null && !mRxBusSubscription.isUnsubscribed())
+        {
+            mRxBusSubscription.unsubscribe();
+        }
+    }
+
+    private void startEventBus()
+    {
         mRxBusSubscription = mEventBus
                 .toObservable()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -51,31 +77,10 @@ public class PDPresenterImpl implements PDPresenter
                         else if (event instanceof ErrorEvent)
                         {
                             mView.hideProgressDialog();
-                            mView.showError(((ErrorEvent) event).getError());
+                            mView.showError(((ErrorEvent) event).getErrorMessage());
                         }
                     }
                 })
                 .subscribe();
-    }
-
-    @Override
-    public void bind(PDView view)
-    {
-        mView = view;
-    }
-
-    @Override
-    public void unbind()
-    {
-        unsubscribe();
-        mView = null;
-    }
-
-    private void unsubscribe()
-    {
-        if (mRxBusSubscription != null && !mRxBusSubscription.isUnsubscribed())
-        {
-            mRxBusSubscription.unsubscribe();
-        }
     }
 }

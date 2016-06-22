@@ -11,6 +11,11 @@ public class Utils
         {
             return url;
         }
-        return "http://" + url;
+        return "https://" + url;
+    }
+
+    public static String formatResponse(String message, int code)
+    {
+        return String.format("%s: %s", message, code);
     }
 }
